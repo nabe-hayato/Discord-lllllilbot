@@ -81,8 +81,6 @@ function loadConfig() {
         throw 'invalid or missing DISCORD_TOK'
     if (SPEECH_METHOD === 'witai' && !WITAI_TOK)
         throw 'invalid or missing WITAI_TOK'
-    if (SPEECH_METHOD === 'google' && !fs.existsSync('./gspeech_key.json'))
-        throw 'missing gspeech_key.json'
     
 }
 loadConfig()
