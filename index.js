@@ -458,6 +458,10 @@ async function transcribe_gspeech(buffer) {
 }
 
 async function transcribe_whisper(buffer) {
+    const bytes = buffer.toString('base64');
+    const audio = {
+        content: bytes,
+    };
     const { Configuration, OpenAIApi } = require('openai');
     const configuration = new Configuration({
         apiKey: process.env.OPENAI_TOK,
@@ -467,7 +471,7 @@ async function transcribe_whisper(buffer) {
   try {
       console.log('transcribe_whisper')
       const resp = await openai.createTranscription(
-          fs.createReadStream(buffer,),
+          fs.createReadStream(audio,),
           "whisper-1"
       );
       console.log(resp.data.text);
