@@ -60,7 +60,6 @@ const SETTINGS_FILE = 'settings.json';
 let DISCORD_TOK = null;
 let WITAI_TOK = null; 
 let SPEECH_METHOD = 'vosk'; // witai, google, vosk
-let OPENAI_TOK = null;
 
 function loadConfig() {
     if (fs.existsSync(SETTINGS_FILE)) {
@@ -68,12 +67,10 @@ function loadConfig() {
         DISCORD_TOK = CFG_DATA.DISCORD_TOK;
         WITAI_TOK = CFG_DATA.WITAI_TOK;
         SPEECH_METHOD = CFG_DATA.SPEECH_METHOD;
-        OPENAI_TOK = CFG_DATA.OPENAI_TOK;
     }
     DISCORD_TOK = process.env.DISCORD_TOK || DISCORD_TOK;
     WITAI_TOK = process.env.WITAI_TOK || WITAI_TOK;
     SPEECH_METHOD = process.env.SPEECH_METHOD || SPEECH_METHOD;
-    OPENAI_TOK = process.env.OPENAI_TOK || OPENAI_TOK;
 
     if (!['witai', 'google', 'vosk'].includes(SPEECH_METHOD))
         throw 'invalid or missing SPEECH_METHOD'
@@ -81,6 +78,8 @@ function loadConfig() {
         throw 'invalid or missing DISCORD_TOK'
     if (SPEECH_METHOD === 'witai' && !WITAI_TOK)
         throw 'invalid or missing WITAI_TOK'
+    if (SPEECH_METHOD === 'google' && !fs.existsSync('./gspeech_key.json'))
+        throw 'missing gspeech_key.json'
     
 }
 loadConfig()
@@ -340,7 +339,7 @@ function speak_impl(receiver, mapKey) {
             console.log("duration: " + duration)
 
             if (SPEECH_METHOD === 'witai' || SPEECH_METHOD === 'google') {
-            if (duration < 1.0 || duration > 19) { // 20 seconds max dur
+            if (duration < 0.7 || duration > 19) { // 20 seconds max dur
                 console.log("TOO SHORT / TOO LONG; SKPPING")
                 return;
             }
@@ -375,7 +374,7 @@ async function transcribe(buffer, mapKey) {
   if (SPEECH_METHOD === 'witai') {
       return transcribe_witai(buffer)
   } else if (SPEECH_METHOD === 'google') {
-      return transcribe_whisper(buffer)
+      return transcribe_gspeech(buffer)
   } else if (SPEECH_METHOD === 'vosk') {
       let val = guildMap.get(mapKey);
       recs[val.selected_lang].acceptWaveform(buffer);
@@ -456,32 +455,6 @@ async function transcribe_gspeech(buffer) {
 
   } catch (e) { console.log('transcribe_gspeech 368:' + e) }
 }
-
-async function transcribe_whisper(buffer) {
-    const bytes = buffer.toString('base64');
-    const audio = {
-        content: bytes,
-    };
-    const { Configuration, OpenAIApi } = require('openai');
-    const configuration = new Configuration({
-        apiKey: process.env.OPENAI_TOK,
-    });
-    const openai = new OpenAIApi(configuration);
-
-  try {
-      console.log('transcribe_whisper')
-      const resp = await openai.createTranscription(
-          fs.createReadStream(audio,),
-          "whisper-1"
-      );
-      console.log(resp.data.text);
-
-      const transcription = resp.data.text
-      return transcription;
-
-  } catch (e) { console.log('transcribe_whisper 368:' + e) }
-}
-
 
 ///////////////////////////////////////////////////////////
 /// Run a web server to deploy on Render as web service ///
