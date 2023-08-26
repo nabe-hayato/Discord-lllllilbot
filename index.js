@@ -339,7 +339,7 @@ function speak_impl(receiver, mapKey) {
             console.log("duration: " + duration)
 
             if (SPEECH_METHOD === 'witai' || SPEECH_METHOD === 'google') {
-            if (duration < 0.7 || duration > 19) { // 20 seconds max dur
+            if (duration < 1 || duration > 19) { // 20 seconds max dur
                 console.log("TOO SHORT / TOO LONG; SKPPING")
                 return;
             }
