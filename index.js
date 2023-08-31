@@ -340,7 +340,6 @@ function speak_impl(receiver, mapKey) {
 
             if (SPEECH_METHOD === 'witai' || SPEECH_METHOD === 'google') {
             if (duration < 1 || duration > 19) { // 20 seconds max dur
-                console.log("TOO SHORT / TOO LONG; SKPPING")
                 return;
             }
             }
