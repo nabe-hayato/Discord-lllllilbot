@@ -421,7 +421,7 @@ async function transcribe_witai(buffer) {
 // Google Speech API
 // https://cloud.google.com/docs/authentication/production
 const gspeech = require('@google-cloud/speech').v2;
-const gspeechclient = new gspeech.SpeechClient({
+const gspeechclient = new speech.SpeechClient({
   projectId: 'discordbot',
   keyFilename: 'gspeech_key.json'
 });
