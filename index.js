@@ -428,7 +428,7 @@ const gspeechclient = new speech.SpeechClient({
 
 async function transcribe_gspeech(buffer) {
   try {
-      console.log('transcribe_gspeech')
+      console.log('transcribe_gspeechv2')
       const bytes = buffer.toString('base64');
       const audio = {
         content: bytes,
